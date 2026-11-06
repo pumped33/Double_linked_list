@@ -114,47 +114,6 @@ int             list_set_next                           (double_linked_list_t* d
 int             list_get_pref                           (double_linked_list_t* double_linked_list_info, int index);
 int             list_set_pref                           (double_linked_list_t* double_linked_list_info, int index, int elem);
 
-int main() {
-
-    double_linked_list_t double_linked_list_info = {};
-    list_init(&double_linked_list_info, 5);
-    list_insert(&double_linked_list_info, 0, 1);
-    list_insert(&double_linked_list_info, 1, 2);
-    
-    list_insert(&double_linked_list_info, 2, 2);
-    list_insert_begin(&double_linked_list_info, 0);
-    
-    list_pop(&double_linked_list_info, 2);
-    list_destroy(&double_linked_list_info);
-
-    // list_insert_begin(&double_linked_list_info, 0);
-    // list_insert_end(&double_linked_list_info, 4);
-    // // list_insert(&double_linked_list_info, 4, 10);
-
-    
-    // list_pop(&double_linked_list_info, 1);
-    // list_pop_end(&double_linked_list_info);
-    // list_pop_begin(&double_linked_list_info);
-
-    // list_dump_in_console(&double_linked_list_info);
-    // print_list(&double_linked_list_info);
-    // list_insert_end(&double_linked_list_info,3);
-
-    // list_insert_begin(&double_linked_list_info,7);
-
-
-    // list_insert_begin(&double_linked_list_info,4);
-
-
-    // list_insert_begin(&double_linked_list_info,5);
-    print_list(&double_linked_list_info);
-    // list_insert(&double_linked_list_info, 1, 3);
-    // list_insert(&double_linked_list_info, 2, 5);
-    // list_insert(&double_linked_list_info, 3, 7);
-
-    
-    return 0;
-}
 
 list_errors_t list_init(double_linked_list_t* double_linked_list_info, int capacity) {
 
@@ -261,19 +220,6 @@ list_errors_t list_pop_end(double_linked_list_t* double_linked_list_info) {
 
 int change_links_insert_element(double_linked_list_t* double_linked_list_info, int index_insert, int element) {
 
-    // int current_free = double_linked_list_info -> free;
-
-    // double_linked_list_info -> free = double_linked_list_info -> next[double_linked_list_info -> free]; 
-
-    // double_linked_list_info -> data[current_free] = element;
-
-    // int temp = double_linked_list_info -> next[index_insert]; 
-    // double_linked_list_info -> next[index_insert] = current_free;
-    // double_linked_list_info -> next[current_free] = temp;
-
-    // double_linked_list_info -> pref[current_free] = index_insert;
-    // double_linked_list_info -> pref[double_linked_list_info -> next[current_free]] = current_free;
-
     int current_free = double_linked_list_info -> free;
 
     double_linked_list_info -> free = list_get_next(double_linked_list_info, double_linked_list_info -> free); 
@@ -296,12 +242,6 @@ void change_links_pop_element(double_linked_list_t* double_linked_list_info, int
     list_set_pref(double_linked_list_info, list_get_next(double_linked_list_info, index_pop), list_get_pref(double_linked_list_info, index_pop));
     list_set_next(double_linked_list_info, index_pop, double_linked_list_info -> free);
     double_linked_list_info -> free = index_pop;
-    
-    // double_linked_list_info -> next[double_linked_list_info -> pref[index_pop]] = double_linked_list_info -> next[index_pop];
-    // double_linked_list_info -> pref[double_linked_list_info -> next[index_pop]] = double_linked_list_info -> pref[index_pop];
-
-    // double_linked_list_info -> next[index_pop] = double_linked_list_info -> free;
-    // double_linked_list_info -> free = index_pop;
 }
 
 int list_get_data(double_linked_list_t* double_linked_list_info, int index) {
