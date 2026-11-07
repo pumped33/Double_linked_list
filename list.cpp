@@ -78,9 +78,6 @@ struct double_linked_list_t {
     int free     = 1;
     int capacity = 0;
 
-    int head = 0;
-    int tail = 1;
-
     ON_DBG( list_errors_t list_error        = LIST_ERRORS_SUCCESS_EXIT; \
             int           str_code_failure  = 0;                         \
             const char*   func_failure      = "ALL GOOD BRO";             \
@@ -93,7 +90,7 @@ void            list_destroy                            (double_linked_list_t* d
 list_errors_t   list_insert                             (double_linked_list_t* double_linked_list_info, int index_to_insert, int element);
 list_errors_t   list_insert_begin                       (double_linked_list_t* double_linked_list_info, int element);
 list_errors_t   list_insert_end                         (double_linked_list_t* double_linked_list_info, int element);
-int             change_links_insert_element             (double_linked_list_t* double_linked_list_info, int index_insert, int element);
+void             change_links_insert_element            (double_linked_list_t* double_linked_list_info, int index_insert, int element);
 
 list_errors_t   list_pop                                (double_linked_list_t* double_linked_list_info, int index_to_pop);
 list_errors_t   list_pop_begin                          (double_linked_list_t* double_linked_list_info);
@@ -115,6 +112,19 @@ int             list_get_pref                           (double_linked_list_t* d
 int             list_set_pref                           (double_linked_list_t* double_linked_list_info, int index, int elem);
 
 
+int main() {
+    double_linked_list_t double_linked_list_info = {};
+    list_init(&double_linked_list_info, 6);
+
+    list_insert(&double_linked_list_info, 0, 1);
+    list_insert(&double_linked_list_info, 1, 2);
+    list_insert(&double_linked_list_info, 2, 2);
+    list_insert_begin(&double_linked_list_info, 67);
+    double_linked_list_info.next[3] = 100;
+    list_insert(&double_linked_list_info, 3, 3);
+    list_destroy(&double_linked_list_info);
+    return 0;
+}
 list_errors_t list_init(double_linked_list_t* double_linked_list_info, int capacity) {
 
     double_linked_list_info -> capacity = capacity;
@@ -148,9 +158,7 @@ list_errors_t list_insert(double_linked_list_t* double_linked_list_info, int ind
     CHECK_FREE_IN_NEXT
     ON_DBG(LIST_VERIFY)
 
-    if      (index_to_insert == double_linked_list_info -> tail)      return list_insert_end(double_linked_list_info, element);
-    else if (index_to_insert == double_linked_list_info -> head)      return list_insert_begin(double_linked_list_info, element);
-    else                                                              change_links_insert_element(double_linked_list_info, index_to_insert, element); 
+    change_links_insert_element(double_linked_list_info, index_to_insert, element); 
 
     ON_GRPV(list_dump_html(double_linked_list_info);) 
     ON_DBG(LIST_VERIFY)  //работа  с переменной ошибка 
@@ -162,8 +170,7 @@ list_errors_t list_insert_end(double_linked_list_t* double_linked_list_info, int
     CHECK_FREE_IN_NEXT
     ON_DBG(LIST_VERIFY)
 
-    int current_free = change_links_insert_element(double_linked_list_info, double_linked_list_info -> tail, element);
-    double_linked_list_info -> tail = current_free;
+    change_links_insert_element(double_linked_list_info, list_get_pref(double_linked_list_info, 0), element);
 
     ON_GRPV(list_dump_html(double_linked_list_info);) 
     ON_DBG(LIST_VERIFY)
@@ -175,8 +182,7 @@ list_errors_t list_insert_begin(double_linked_list_t* double_linked_list_info, i
     CHECK_FREE_IN_NEXT
     ON_DBG(LIST_VERIFY)
 
-    int current_free = change_links_insert_element(double_linked_list_info, 0, element); // 0
-    double_linked_list_info -> head = current_free;
+    change_links_insert_element(double_linked_list_info, 0, element); // 0
 
     ON_GRPV(list_dump_html(double_linked_list_info);) 
     ON_DBG(LIST_VERIFY)  
@@ -198,8 +204,7 @@ list_errors_t list_pop_begin(double_linked_list_t* double_linked_list_info) {
     
     ON_DBG(LIST_VERIFY)
 
-    change_links_pop_element(double_linked_list_info, double_linked_list_info -> head);
-    double_linked_list_info -> head = list_get_next(double_linked_list_info, double_linked_list_info -> head);
+    change_links_pop_element(double_linked_list_info, list_get_next(double_linked_list_info, 0));
 
     ON_GRPV(list_dump_html(double_linked_list_info);) 
     ON_DBG(LIST_VERIFY)
@@ -210,15 +215,14 @@ list_errors_t list_pop_end(double_linked_list_t* double_linked_list_info) {
     
     ON_DBG(LIST_VERIFY)
 
-    change_links_pop_element(double_linked_list_info, double_linked_list_info -> tail);
-    double_linked_list_info -> tail = list_get_next(double_linked_list_info, double_linked_list_info -> tail);
+    change_links_pop_element(double_linked_list_info, list_get_pref(double_linked_list_info, 0));
 
     ON_GRPV(list_dump_html(double_linked_list_info);) 
     ON_DBG(LIST_VERIFY)
     return LIST_ERRORS_SUCCESS_EXIT;
 }
 
-int change_links_insert_element(double_linked_list_t* double_linked_list_info, int index_insert, int element) {
+void change_links_insert_element(double_linked_list_t* double_linked_list_info, int index_insert, int element) {
 
     int current_free = double_linked_list_info -> free;
 
@@ -232,8 +236,6 @@ int change_links_insert_element(double_linked_list_t* double_linked_list_info, i
 
     list_set_pref(double_linked_list_info, current_free, index_insert);
     list_set_pref(double_linked_list_info, double_linked_list_info -> next[current_free], current_free);
-
-    return current_free;
 }
  
 void change_links_pop_element(double_linked_list_t* double_linked_list_info, int index_pop) {
@@ -277,9 +279,6 @@ void list_destroy(double_linked_list_t* double_linked_list_info) {
     
     double_linked_list_info -> free     = 1;
     double_linked_list_info -> capacity = 0;
-
-    double_linked_list_info -> head     = 1;
-    double_linked_list_info -> tail     = 1;
 
     ON_DBG(double_linked_list_info -> list_error        = LIST_ERRORS_SUCCESS_EXIT; 
            double_linked_list_info -> str_code_failure  = 0;                         
@@ -391,8 +390,8 @@ fprintf(file,
             double_linked_list_info -> capacity);
 
     fprintf(file, "\n");
-    fprintf(file, "HEAD: %d\n", double_linked_list_info -> head);
-    fprintf(file, "TAIL: %d\n", double_linked_list_info -> tail);
+    fprintf(file, "HEAD: %d\n", list_get_next(double_linked_list_info, 0));
+    fprintf(file, "TAIL: %d\n", list_get_pref(double_linked_list_info, 0));
     fprintf(file, "FREE: %d\n", double_linked_list_info -> free);
     fprintf(file, "\n");
     fprintf(file, "</span>\n");
@@ -452,8 +451,8 @@ void list_dump_in_console(double_linked_list_t* double_linked_list_info) {
     printf(     "CAPACITY =     %d\n", double_linked_list_info -> capacity); 
 
     printf("\n");
-    printf(     "HEAD =         %d\n", double_linked_list_info -> head);
-    printf(     "TAIL =         %d\n", double_linked_list_info -> tail);
+    printf(     "HEAD =         %d\n", list_get_next(double_linked_list_info, 0));
+    printf(     "TAIL =         %d\n", list_get_pref(double_linked_list_info, 0));
     printf(     "FREE =         %d\n", double_linked_list_info -> free);
     printf("\n");
      
@@ -538,11 +537,11 @@ void list_graph_dump(double_linked_list_t* double_linked_list_info, char* name_g
     fprintf(debug_out, "edge[dir=\"forward\", weight=0, arrowsize=0.5];\n");
 
     // connect special blocks to elems
-    fprintf(debug_out, "HEAD -> elem%d\n",  double_linked_list_info -> head);
-    fprintf(debug_out, "TAIL -> elem%d\n",  double_linked_list_info -> tail);
+    fprintf(debug_out, "HEAD -> elem%d\n",  list_get_next(double_linked_list_info, 0));
+    fprintf(debug_out, "TAIL -> elem%d\n",  list_get_pref(double_linked_list_info, 0));
     fprintf(debug_out, "FREE -> elem%d\n",  double_linked_list_info -> free);
 
-
+    //next and prev both positions 
     next_cell = 0;
     do {
         fprintf(debug_out, "elem%d -> elem%d;\n", next_cell, list_get_next(double_linked_list_info, next_cell));
@@ -563,3 +562,5 @@ void list_graph_dump(double_linked_list_t* double_linked_list_info, char* name_g
     strcpy(extension, ".png");
 }
 
+//prev and next if both dest, and separate if not
+//add examples 
